@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHQ 통합 관리 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="/chq/templates/A.png" type="image/x-icon">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+        }
+
+        /* 오로라 그라데이션 색상 네비게이션 바 */
+        .navbar {
+            background: linear-gradient(90deg, #00c6ff 0%, #0072ff 50%, #00c6ff 100%);
+        }
+        .navbar .nav-link {
+            color: white !important;
+            margin-right: 15px;
+        }
+        .navbar .nav-link:hover {
+            color: #ff4d4d !important;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to right, #83a4d4, #b6fbff); /* 블루와 그레이 계열 그라데이션 */
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: fadeIn 3s ease-in-out;
+        }
+        .hero-section p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            animation: fadeIn 3s ease-in-out;
+        }
+        .btn-custom {
+            background-color: #0072ff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            animation: fadeIn 3s ease-in-out;
+        }
+        .btn-custom:hover {
+            background-color: #005bb5;
+        }
+
+        input[type="file"].form-control {
+            margin: auto;
+            display: block;
+            width: 100%;
+        }
+
+        /* 중앙 텍스트 애니메이션 */
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- 상단 네비게이션 바 -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand text-white" href="/" style="font-size: 1.7rem; font-weight: bold;">Axiom</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" href="/" style="font-size: 1.1rem; font-weight: bold;">Home</a>
+                    </li>-->
+
+                    <!--상단 업로드 버튼-->
+                    <li class="nav-item">
+                        <label for="fileUpload" class="nav-link" style="font-size: 1.0rem; cursor: pointer;">
+                            파일 업로드
+                        </label>
+                        <form action="/" method="POST" enctype="multipart/form-data" style="display: none;">
+                            <input type="file" id="fileUpload" name="files" multiple onchange="this.form.submit()" />
+                        </form>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/sex_mismatch" style="font-size: 1.0rem; ">성별불일치 리스트</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="wkstDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.0rem; ">
+                            WKST 리스트
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="wkstDropdown" id="wkstList">
+                            <!-- JavaScript로 채워질 부분 -->
+                        </ul>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 플래시 메시지 출력 -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-info" role="alert" style="margin-bottom: 20px;">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+
+        <div class="container">
+            <h1>CHQ 통합 관리 시스템</h1>
+            <p>Agile Axiom CHQ System</p>
+            <a href="#features" class="btn btn-custom">자세히 보기</a>
+        </div>
+    </section>
+
+<!-- 주요 기능 섹션 -->
+<div class="container mt-5">
+    <h2 id="features" class="text-center mb-4">Services</h2>
+    <div class="row">
+    
+        <div class="col-lg-4 col-md-6">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h3 class="card-title">성별불일치 리스트</h3>
+                    <a href="/sex_mismatch" class="btn btn-custom">바로가기</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8 col-md-6">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h3 class="card-title">WKST 리스트</h3>
+                    <div class="row" id="wkstCards">
+                        <!-- JavaScript로 카드 생성 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <footer>
+        <p>&copy; 2024 CHQ 통합 관리 시스템 LDW. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Flask에서 전달된 wkst 데이터를 JavaScript로 사용
+        const wkst = {{ wkst|tojson }};
+
+        // WKST 리스트 요소 생성
+        const wkstList = document.getElementById("wkstList");
+        // 알파벳, 숫자 순 오름차순 정렬
+        wkst.sort((a, b) => a.localeCompare(b));
+        wkst.forEach(barcode => {
+            const listItem = document.createElement("li");
+            listItem.className = "dropdown-item";
+            listItem.innerHTML = `<a href="/view/${barcode}">${barcode}</a>`;
+            wkstList.appendChild(listItem);
+        });
+        
+
+        
+        // WKST 카드 섹션 요소 가져오기
+        const wkstCards = document.getElementById("wkstCards");
+
+        // WKST 데이터에 따라 카드 생성
+        wkst.forEach(barcode => {
+            // 카드 요소 생성
+            const card = document.createElement("div");
+            card.className = "col-lg-4 col-md-6 mb-4";
+            card.innerHTML = `
+                <div class="card wkst-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${barcode}</h5>
+                        <a href="/view/${barcode}" class="btn btn-custom">바로가기</a>
+                    </div>
+                </div>
+            `;
+            // 생성된 카드 요소를 wkstCards에 추가
+            wkstCards.appendChild(card);
+        });
+    </script>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

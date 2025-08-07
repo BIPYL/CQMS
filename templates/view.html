@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>{{ title }} Axiom CHQ System</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="/chq/templates/A.png" type="image/x-icon">
+    <style>
+        /* 오로라 그라데이션 색상 네비게이션 바 */
+        .navbar {
+            background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 50%, #FFFFFF 100%);
+            height: 70px; /* 원하는 높이로 설정 */
+            border-bottom: 0.03px solid #c7c5c5; /* 검은색 구분선 */
+        }
+        .navbar .nav-link {
+            color: #525659 !important;
+            margin-right: 15px;
+        }
+        .navbar .nav-link:hover {
+            color: #ffc14d !important;
+            font-weight: bold; /* 또는 font-weight: 700; */
+        }
+
+        /* Hero Section */
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to right, #83a4d4, #b6fbff); /* 블루와 그레이 계열 그라데이션 */
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: fadeIn 3s ease-in-out;
+        }
+        .hero-section p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            animation: fadeIn 3s ease-in-out;
+        }
+        .btn-custom {
+            background-color: #0072ff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            animation: fadeIn 3s ease-in-out;
+        }
+        .btn-custom:hover {
+            background-color: #005bb5;
+        }
+        /* 중앙 텍스트 애니메이션 */
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        
+
+        body {
+            background: linear-gradient(to bottom, #ffffff, #ffffff);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden; /* 가로 스크롤 제거 */
+            margin: 0; /* 여백 제거 */
+        }
+        .container {
+            display: grid;
+            
+            gap: 10px; /* 콘텐츠 사이 간격 설정 */
+            padding: 10px;
+            box-sizing: border-box;
+            width: 100vw;
+            height: auto; /* 자동 높이 조정 */
+        }
+        .content {
+            padding: 10px;
+            box-sizing: border-box;
+            overflow: auto;
+            background: #fff; /* 배경색을 설정하여 시각적 구분 */
+        }
+        .table-container {
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow-x: auto; /* 가로 스크롤 가능 */
+            max-height: calc(100vh - 120px);
+            box-sizing: border-box;
+            width: 100%; /* 테이블이 전체 너비를 사용하도록 설정 */
+            font-size: 10px
+        }
+        .table {
+            width: 100%; /* 테이블 너비를 100%로 설정 */
+            table-layout: fixed; /* 열 너비 고정 */
+            border-collapse: collapse; /* 테두리 겹침 제거 */
+        }
+        .table th, .table td {
+            text-align: center;
+            font-size: 13px; /* 글씨 크기 조정 */
+            overflow: hidden; /* 넘친 내용 숨기기 */
+            white-space: nowrap; /* 텍스트 줄 바꿈 방지 */
+            text-overflow: ellipsis; /* 넘친 텍스트에 생략 기호 추가 */
+            padding: 5px; /* 패딩 조정 */
+            position: relative; /* 호버 시 툴팁 표시를 위해 위치 설정 */
+        }
+        .cell {
+            width: 30px;
+            height: 30px;
+            font-size: 5px;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #ddd; /* 기본 테두리 */
+            transition: background-color 0.3s; /* 색상 전환 애니메이션 */
+        }
+
+        /* 호버 시 칩 포지션 표시 */
+        .table td:hover::after {
+            content: attr(data-chip-position); /* 칩 포지션 값 표시 */
+            position: absolute; /* 툴팁 위치 설정 */
+            top: 50%; /* 수직 가운데 정렬 */
+            left: 50%; /* 수평 가운데 정렬 */
+            transform: translate(-50%, -50%); /* 가운데 정렬 보정 */
+            background-color: rgba(0, 0, 0, 0.7); /* 배경색 */
+            color: white; /* 텍스트 색상 */
+            padding: 5px; /* 패딩 설정 */
+            border-radius: 5px; /* 테두리 반경 */
+            font-size: 12px; /* 폰트 크기 */
+            white-space: nowrap; /* 줄 바꿈 방지 */
+            z-index: 1000; /* 다른 요소 위에 표시되도록 설정 */
+        }
+        
+        .fail {
+            background-color: rgba(255, 99, 132, 0.5) !important; /* 실패 셀 강조 */
+        }
+        .good {
+            background-color: rgba(0, 255, 132, 0.3); /* 실패 셀 강조 */
+        }
+        .btn-custom {
+            background-color: #ff6f61; /* 파스텔 오렌지 */
+            color: white;
+            border-radius: 25px;
+        }
+        .btn-custom:hover {
+            background-color: #ff4d4d; /* 호버 색상 */
+        }
+        h1, h2 {
+            color: #333; /* 텍스트 색상 */
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            display: none; /* 초기에는 보이지 않도록 설정 */
+            font-size: 12px;
+            z-index: 1000; /* 다른 요소 위에 표시되도록 설정 */
+        }
+
+        .content {
+            margin: 0px
+            padding: 20px;
+        }
+        .table-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px; /* 테이블 간의 간격 */
+        }
+        .table-wrapper > div {
+            flex: 1;
+            min-width: 45%; /* 최소 너비 설정 */
+            box-sizing: border-box; /* 패딩과 테두리를 너비에 포함 */
+        }
+        .tables-wrapper {
+            display: flex; /* 자식 요소를 가로로 배치 */
+            gap: 10px; /* 테이블 사이의 간격 설정 */
+            overflow-x: auto; /* 자식 요소가 컨테이너를 넘어갈 경우 가로 스크롤 가능 */
+        }
+        .table-item {
+            flex: 1; /* 자식 요소가 가용 공간을 균등하게 나누도록 설정 */
+            min-width: 0; /* 최소 너비 설정 제거 */
+            box-sizing: border-box; /* 패딩과 테두리를 너비에 포함 */
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr; /* 모바일 화면에서는 단일 열로 변경 */
+            }
+
+        #searchInput {
+            width: 100%;
+        }
+        
+        #filterSelect {
+            width: 100%;
+        }
+        .d-none {
+            display: none;
+        }
+        .d-block {
+            display: block;
+        }
+        .comments-content {
+            position: relative;
+            padding-bottom: 50px; /* 버튼 높이만큼 여백 추가 */
+        }
+        #toggleComments {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+        .comments-preview li, .full-comments-list li {
+            margin-bottom: 5px;
+        }
+        
+
+    </style>
+</head>
+<body>
+    <header>
+        <!-- 상단 네비게이션 바 -->
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand text-white" href="/" style="font-size: 1.7rem; color: #272829 !important;">Axiom</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <!-- <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>-->
+                        <li class="nav-item">
+                            <a class="nav-link" href="/sex_mismatch">성별불일치 리스트</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="wkstDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                WKST 리스트
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="wkstDropdown" id="wkstList">
+                                <!-- JavaScript로 채워질 부분 -->
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </header>
+
+    <li></li>
+    <h1 class="text-center">{{ wkst }}</h1>
+    <h2 class="text-center">{{code3}}</h2>
+
+
+    <div class="container">
+        <!-- 왼쪽 단 -->
+        <div class="content left">
+
+            {% if comments %}
+                <div class="alert alert-warning mt-4" id="commentsSection">
+                    <h2>LIMS Comment</h2>
+                    
+                    <div id="commentsContent" class="comments-content">
+                        <div id="commentsPreview" class="comments-preview">
+                            <!-- 첫 10줄만 표시될 부분 -->
+                            <ul id="previewList"></ul>
+                        </div>
+                        <div id="fullComments" class="d-none">
+                            <!-- 전체 내용 표시 -->
+                            <ul id="fullCommentsList"></ul>
+                        </div>
+                        <button id="toggleComments" class="btn btn-primary mt-2">더보기</button>
+                        <button id="copyComments" class="btn btn-secondary mt-2">복사하기</button> <!-- 복사 버튼 추가 -->
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="table-container">
+                <h2>이슈샘플 리스트</h2>
+
+                <!-- 검색 및 필터 입력 필드 추가 -->
+                <div class="mb-3">
+                    <input type="text" id="searchInput" class="form-control mb-2" placeholder="검색...">
+                    <select id="filterSelect" class="form-control">
+                        <option value="">모든 컬럼</option>
+                        {% for column in columns %}
+                        <option value="{{ column }}">{{ column }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <table id="dataTable" class="table table-striped table-hover table-sm">
+                    <thead>
+                        <tr>
+                            {% for column in columns %}
+                            <th>{{ column }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                        <tr>
+                            {% for column in columns %}
+                            <td>{{ row[column] }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+            
+            <div class="table-container">
+                <h2>Plate View <span id="averageValue">(평균: <span id="averageDisplay">N/A</span>)</span></h2>
+                <select id="valueSelector" class="form-control mb-3">
+                    {% if content == 'mismatch' %}
+                        <option value="chip_position">384_ChipPosition</option>
+                        <option value="call_rate">Call Rate</option>
+                        <option value="qc_call_rate">QC Call Rate</option>
+                    {% else %}
+                        <option value="dqc">DQC</option>
+                        <option value="call_rate">Call Rate</option>
+                        <option value="qc_call_rate">QC Call Rate</option>
+                        <option value="chip_position">384_ChipPosition</option>
+                    {% endif %}
+
+                </select>
+                <table class="table table-bordered table-hover table-sm">
+                    {% for row in 'ABCDEFGHIJKLMNOP' %}
+                    <tr>
+                        {% for col in range(1, 25) %}
+                        <td id="{{ row }}{{ '%02d' % col }}" class="cell" data-chip-position="{{ row }}{{ '%02d' % col }}"></td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+                <div id="tooltip" class="tooltip"></div>
+            </div>
+            
+        </div>
+        
+        <!-- 오른쪽 단 -->
+        <div class="content right">
+            <div class="table-container">
+            <!-- 96 테이블 4개를 시각화하는 부분 -->
+                <div class="tables-wrapper">
+                    <!-- Table 1: 홀수 열과 홀수 행 -->
+                    <div class="table-item">
+                        <h4>Plate 1</h4>
+                        <table class="table table-bordered table-hover table-sm">
+                            {% for row in 'ACEGIKMO' %}
+                            <tr>
+                                {% for col in range(1, 25, 2) %}
+                                <td id="{{ row }}{{ '%02d' % col }}" class="cell" data-chip-position="{{ row }}{{ '%02d' % col }}"></td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+
+                    <!-- Table 2: 짝수 열과 홀수 행 -->
+                    <div class="table-item">
+                        <h4>Plate 2</h4>
+                        <table class="table table-bordered table-hover table-sm">
+                            {% for row in 'ACEGIKMO' %}
+                            <tr>
+                                {% for col in range(2, 25, 2) %}
+                                <td id="{{ row }}{{ '%02d' % col }}" class="cell" data-chip-position="{{ row }}{{ '%02d' % col }}"></td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tables-wrapper">
+                    <!-- Table 3: 홀수 열과 짝수 행 -->
+                    <div class="table-item">
+                        <h4>Plate 3</h4>
+                        <table class="table table-bordered table-hover table-sm">
+                            {% for row in 'BDFHJLNP' %}
+                            <tr>
+                                {% for col in range(1, 25, 2) %}
+                                <td id="{{ row }}{{ '%02d' % col }}" class="cell" data-chip-position="{{ row }}{{ '%02d' % col }}"></td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+
+                    <!-- Table 4: 짝수 열과 짝수 행 -->
+                    <div class="table-item">
+                        <h4>Plate 4</h4>
+                        <table class="table table-bordered table-hover table-sm">
+                            {% for row in 'BDFHJLNP' %}
+                            <tr>
+                                {% for col in range(2, 25, 2) %}
+                                <td id="{{ row }}{{ '%02d' % col }}" class="cell" data-chip-position="{{ row }}{{ '%02d' % col }}"></td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+        </div>
+    </div>
+    
+    
+    <script>
+        {% if content == 'mismatch' %}
+            const data = {{ data | tojson }};
+        {% else %}
+            const data = {{ data2 | tojson }};
+        {% endif %} 
+
+        const valueSelector = document.getElementById('valueSelector');
+        const cells = document.querySelectorAll('.cell');
+        const tooltip = document.getElementById('tooltip');
+        const averageDisplay = document.getElementById('averageDisplay');
+        
+        ///드롭다운 목록///
+        const wkstdb = {{ data4 | tojson}};
+        const wkstData = Array.from(new Set(wkstdb.map(item => item.wkst)));
+
+
+        // WKST 리스트 요소 생성
+        const wkstList = document.getElementById("wkstList");
+        // 알파벳, 숫자 순 오름차순 정렬
+        wkstData.sort((a, b) => a.localeCompare(b));
+        wkstData.forEach(barcode => {
+            const listItem = document.createElement("li");
+            listItem.className = "dropdown-item";
+            listItem.innerHTML = `<a href="/view/${barcode}">${barcode}</a>`;
+            wkstList.appendChild(listItem);
+        console.log(wkstData); // wkst 컬럼의 데이터 출력
+        });
+
+        ///접기, 펼치기 기능///
+        document.addEventListener('DOMContentLoaded', function() {
+            const comments = `{{ comments|safe }}`; // 전체 코멘트 문자열
+            const lines = comments.split('<br>'); // <br> 태그를 기준으로 줄 나누기
+            
+            const previewList = document.getElementById('previewList');
+            const fullCommentsList = document.getElementById('fullCommentsList');
+            const toggleButton = document.getElementById('toggleComments');
+            
+            // 첫 10줄만 preview에 추가
+            lines.slice(0, 10).forEach(line => {
+                const li = document.createElement('li');
+                li.innerHTML = line;
+                previewList.appendChild(li);
+            });
+            
+            // 전체 내용 추가
+            lines.forEach(line => {
+                const li = document.createElement('li');
+                li.innerHTML = line;
+                fullCommentsList.appendChild(li);
+            });
+    
+            // 토글 버튼 이벤트 리스너
+            toggleButton.addEventListener('click', function() {
+                const fullComments = document.getElementById('fullComments');
+                const commentsPreview = document.getElementById('commentsPreview');
+    
+                if (fullComments.classList.contains('d-none')) {
+                    fullComments.classList.remove('d-none');
+                    commentsPreview.classList.add('d-none');
+                    toggleButton.textContent = '접기'; // 버튼 텍스트 변경
+                } else {
+                    fullComments.classList.add('d-none');
+                    commentsPreview.classList.remove('d-none');
+                    toggleButton.textContent = '전체보기'; // 버튼 텍스트 변경
+                }
+            });
+        });
+
+
+        ///복사하기 버튼///
+        document.addEventListener('DOMContentLoaded', function() {
+            const copyButton = document.getElementById('copyComments');
+            const toggleButton = document.getElementById('toggleComments');
+            const previewList = document.getElementById('previewList');
+            const fullCommentsList = document.getElementById('fullCommentsList');
+            let isExpanded = false;
+        
+            function toggleComments() {
+                if (isExpanded) {
+                    previewList.style.display = 'block';
+                    fullCommentsList.style.display = 'none';
+                    toggleButton.textContent = '더보기';
+                } else {
+                    previewList.style.display = 'none';
+                    fullCommentsList.style.display = 'block';
+                    toggleButton.textContent = '접기';
+                }
+                isExpanded = !isExpanded;
+            }
+        
+            function copyToClipboard() {
+                let commentsList;
+                if (isExpanded) {
+                    commentsList = fullCommentsList.querySelectorAll('li');
+                } else {
+                    commentsList = fullCommentsList.querySelectorAll('li'); //접혀있어도 전체내용 복사.
+                    /*commentsList = previewList.querySelectorAll('li');*/
+                }
+        
+                let textContent = '';
+                commentsList.forEach(comment => {
+                    textContent += comment.innerText + '\n';
+                });
+        
+                const textarea = document.createElement('textarea');
+                textarea.value = textContent.trim();
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+        
+                alert('내용이 클립보드에 복사되었습니다!');
+            }
+        
+            toggleButton.addEventListener('click', toggleComments);
+            copyButton.addEventListener('click', copyToClipboard);
+        });
+
+
+        ///필터. 검색 기능///
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const filterSelect = document.getElementById('filterSelect');
+            const dataTable = document.getElementById('dataTable');
+            const tableRows = dataTable.querySelectorAll('tbody tr');
+        
+            function filterTable() {
+                const searchValue = searchInput.value.toLowerCase();
+                const filterValue = filterSelect.value;
+        
+                tableRows.forEach(row => {
+                    let match = true;
+        
+                    // 검색 기능
+                    if (searchValue) {
+                        match = Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(searchValue));
+                    }
+        
+                    // 필터 기능
+                    if (match && filterValue) {
+                        const columnIndex = Array.from(row.cells).findIndex(cell => cell.textContent.includes(filterValue));
+                        match = columnIndex > -1;
+                    }
+        
+                    row.style.display = match ? '' : 'none';
+                });
+            }
+        
+            searchInput.addEventListener('input', filterTable);
+            filterSelect.addEventListener('change', filterTable);
+        });
+
+        /*
+        //평균값 표시
+        document.addEventListener('DOMContentLoaded', function() {
+            // 예제 데이터 (서버에서 받아온 실제 데이터로 대체)
+            console.log('Data:', data); // data 객체 확인
+            console.log('Value Selector:', document.getElementById('valueSelector')); // select 요소 확인
+        
+            function calculateAverage(values) {
+                const sum = values.reduce((a, b) => a + b, 0);
+                return (sum / values.length).toFixed(2);
+            }
+        
+            function updateAverage() {
+                const selector = document.getElementById('valueSelector');
+                const selectedValue = selector.value;
+                const averageDisplay = document.getElementById('averageDisplay');
+                
+                console.log('Selected Value:', selectedValue); // 선택된 값 확인
+        
+                if (data[selectedValue]) {
+                    const average = calculateAverage(data[selectedValue]);
+                    averageDisplay.textContent = average;
+                } else {
+                    averageDisplay.textContent = 'N/A';
+                }
+            }
+        
+            document.getElementById('valueSelector').addEventListener('change', updateAverage);
+        
+            // 초기 평균값 업데이트
+            updateAverage();
+        });
+        */
+
+        function updateTable() {
+            const selectedValue = valueSelector.value;
+            let sum = 0;
+            let count = 0;
+
+            cells.forEach(cell => {
+                const chipPosition = cell.id;
+                const entry = data.find(d => d.chip_position === chipPosition);
+                if (entry) {
+                    const value = entry[selectedValue];
+                    cell.textContent = value;
+
+                    // 모든 클래스 제거
+                    cell.classList.remove('fail');
+                    cell.style.backgroundColor = '';
+
+                    // Normalize value to be between 0 and 1
+                    const normalizedValue = Math.max(0, Math.min(1, value)); 
+                    let threshold; // 변수 선언
+
+                    if (selectedValue === 'dqc'){
+                        threshold = 0.90;
+                    }
+                    else{
+                        threshold = 0.95;
+                    }
+                    // Adjust normalized value to have a minimum of 0.5 for color application
+                    const adjustedValue = Math.min(1, (normalizedValue - threshold) / (1 - threshold));
+
+                    cell.setAttribute('data-chip-position', chipPosition);
+
+
+                    if ((selectedValue === 'call_rate' && value < 0.9) ||
+                        (selectedValue === 'dqc' && value < 0.82) ||
+                        (selectedValue === 'qc_call_rate' && value < 0.9) ||
+                        (selectedValue === 'chip_position')) {
+                        cell.classList.add('fail');
+                        
+                    } else {
+                        cell.classList.remove('fail');
+                        // Apply gradient color based on the adjusted value
+                        // Apply gradient color based on the adjusted value
+                        //const backgroundColor = `rgba(75, 192, 192, ${adjustedValue})`; // Teal color gradient
+                        //cell.style.backgroundColor = backgroundColor;
+
+                                        // Apply gradient color based on the adjusted value
+                        const backgroundColor = `rgba(255, 213, 61, ${adjustedValue})`; // Bright Red color gradient
+                        const alternativeColor = `rgba(54, 162, 235, ${adjustedValue})`; // Bright Blue color gradient
+
+                        cell.style.backgroundColor = adjustedValue < 0.5 ? backgroundColor : alternativeColor;
+                                            // Set data-chip-position attribute for tooltip
+                        
+                    }
+
+                    // 평균 계산을 위한 값 누적
+                    if (!isNaN(normalizedValue)) {
+                        sum += normalizedValue;
+                        count++;
+                    }
+
+                } else {
+                    cell.textContent = '';
+                    cell.style.backgroundColor = ''; // Reset background color if no data
+                    cell.classList.remove('fail');
+                    cell.removeAttribute('data-chip-position');
+                    
+                }
+            });
+            // 평균 계산 및 표시
+            const average = count > 0 ? (sum / count).toFixed(3) : 'N/A';
+            const averageDisplay = document.getElementById('averageDisplay');
+            if (averageDisplay) {
+                averageDisplay.textContent = average;
+            }
+        }
+
+
+        cells.forEach(cell => {
+            cell.addEventListener('mouseover', (event) => {
+                tooltip.style.display = 'block';
+                tooltip.textContent = `Chip Position: ${event.target.getAttribute('data-chip-position')}`;
+                const rect = event.target.getBoundingClientRect();
+                tooltip.style.left = `${rect.left + window.scrollX}px`;
+                tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight}px`;
+            });
+    
+            cell.addEventListener('mouseout', () => {
+                tooltip.style.display = 'none';
+            });
+        });
+
+
+        valueSelector.addEventListener('change', updateTable);
+        updateTable();
+
+        
+
+     
+    </script>
+
+    
+</body>
+</html>
